@@ -13,12 +13,6 @@ DIRECTION_STOPWORDS = {
 
 MOVE_VERBS_PATTERN = r"(?:가|가자|가줘|이동|이동해|이동하|이동시켜|이동해줘)$"
 
-# 호출 단어 제거 로직
-WAKEWORD_PATTERN = re.compile(r'^\s*(도리|돌이|둘리)[야아]?[,\s]*', re.IGNORECASE)
-def _strip_wakeword(text: str) -> str:
-    return WAKEWORD_PATTERN.sub('', text, count=1).strip()
-
-
 def extract_location_command(text: str) -> Optional[str]:
     """
     주어진 텍스트에서 장소 관련 명령을 분석하여 목적지나 행동을 추출합니다.
@@ -62,16 +56,16 @@ def extract_location_command(text: str) -> Optional[str]:
 class IntentRouter(Node):
     def __init__(self):
         super().__init__('intent_router')
-        self.sub = self.create_subscription(String, '/text_command', self.cb, 10)
+        self.sub = self.create_subscription(String, '/voice2text', self.cb, 10)
         self.pub_loc = self.create_publisher(String, '/text_to_location', 10)
         self.pub_llm = self.create_publisher(String, '/text_to_llm', 10)
         self.get_logger().info("IntentRouter started (User-logic applied).")
 
     def cb(self, msg: String):
-        # 1. 호출 단어 제거
-        cleaned_text = _strip_wakeword(msg.data)
+        # 1. 호출 단어 제거 로직은 wake_word_detector로 이동했으므로, 받은 데이터를 그대로 사용합니다.
+        cleaned_text = msg.data.strip()
         if not cleaned_text:
-            return # 호출 단어만 들어온 경우 무시
+            return # 빈 문자열인 경우 무시
 
         # 2. 장소 관련 명령어인지 확인 및 목적지 추출
         location_target = extract_location_command(cleaned_text)
