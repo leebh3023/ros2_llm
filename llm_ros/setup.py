@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'openai', 'pvporcupine', 'pyaudio'],
+    install_requires=['setuptools', 'openai', 'pvporcupine', 'pyaudio', 'pyyaml', 'tf2_ros'],
     zip_safe=True,
     maintainer='leebh',
     maintainer_email='leebh3023@gmail.com',
